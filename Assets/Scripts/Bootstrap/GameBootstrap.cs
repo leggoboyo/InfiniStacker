@@ -1,7 +1,11 @@
+using InfiniStacker.Audio;
 using InfiniStacker.Combat;
 using InfiniStacker.Core;
+using InfiniStacker.DebugTools;
 using InfiniStacker.Enemy;
+using InfiniStacker.Feedback;
 using InfiniStacker.Gates;
+using InfiniStacker.Obstacles;
 using InfiniStacker.Player;
 using InfiniStacker.UI;
 using InfiniStacker.World;
@@ -22,7 +26,7 @@ namespace InfiniStacker.Bootstrap
                 return;
             }
 
-            var bootstrap = new GameObject(\"GameBootstrap\");
+            var bootstrap = new GameObject("GameBootstrap");
             bootstrap.AddComponent<GameBootstrap>();
         }
 
@@ -40,6 +44,14 @@ namespace InfiniStacker.Bootstrap
 
             EnsureCamera();
             EnsureDirectionalLight();
+
+            var feedbackRoot = new GameObject("FeedbackServices");
+            var screenShakeService = feedbackRoot.AddComponent<ScreenShakeService>();
+            screenShakeService.Initialize(Camera.main != null ? Camera.main.transform : null);
+            var hapticsService = feedbackRoot.AddComponent<NullHapticsService>();
+            FeedbackServices.Configure(screenShakeService, hapticsService);
+
+            _ = feedbackRoot.AddComponent<AudioSettingsService>();
 
             var moveLimit = BuildBridgeEnvironment();
 
@@ -83,12 +95,21 @@ namespace InfiniStacker.Bootstrap
             gateSpawner.Initialize(playerSquad);
             gateSpawner.SetRunning(false);
 
+            var obstacleSpawnerGo = new GameObject("ObstacleSpawner");
+            var obstacleSpawner = obstacleSpawnerGo.AddComponent<ObstacleSpawner>();
+            obstacleSpawner.Initialize(playerSquad, hitVfxPool);
+            obstacleSpawner.SetRunning(false);
+
             var uiGo = new GameObject("GameUI");
             var uiController = uiGo.AddComponent<GameUIController>();
 
             var gameStateGo = new GameObject("GameStateController");
             var gameStateController = gameStateGo.AddComponent<GameStateController>();
-            gameStateController.Initialize(playerSquad, baseHealth, enemySpawner, gateSpawner, enemyManager, autoFire, playerDragMover);
+            gameStateController.Initialize(playerSquad, baseHealth, enemySpawner, gateSpawner, obstacleSpawner, enemyManager, autoFire, playerDragMover);
+
+            var debugToolsGo = new GameObject("DebugQuickTest");
+            var debugQuickTest = debugToolsGo.AddComponent<DebugQuickTestController>();
+            debugQuickTest.Initialize(playerSquad, enemySpawner, gateSpawner, obstacleSpawner, baseHealth);
 
             uiController.Initialize(gameStateController);
         }

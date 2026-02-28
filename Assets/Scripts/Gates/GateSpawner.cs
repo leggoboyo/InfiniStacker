@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using InfiniStacker.Feedback;
 using InfiniStacker.Player;
 using TMPro;
 using UnityEngine;
@@ -73,6 +74,8 @@ namespace InfiniStacker.Gates
                     var selectedOperation = chooseLeft ? pair.LeftOperation : pair.RightOperation;
                     _playerSquad.ApplyGateOperation(selectedOperation);
                     pair.Applied = true;
+                    FeedbackServices.ScreenShake?.Shake(0.07f, 0.07f);
+                    FeedbackServices.Haptics?.LightImpact();
 
                     pair.LeftRenderer.material.color = new Color(0.35f, 0.35f, 0.35f);
                     pair.RightRenderer.material.color = new Color(0.35f, 0.35f, 0.35f);
@@ -99,7 +102,6 @@ namespace InfiniStacker.Gates
 
             var runtime = new GatePairRuntime
             {
-                PairId = pairId,
                 Z = z,
                 LeftOperation = left,
                 RightOperation = right,
@@ -179,7 +181,6 @@ namespace InfiniStacker.Gates
 
         private struct GatePairRuntime
         {
-            public int PairId;
             public float Z;
             public GateOperation LeftOperation;
             public GateOperation RightOperation;

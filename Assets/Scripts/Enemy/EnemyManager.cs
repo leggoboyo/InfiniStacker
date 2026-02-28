@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using InfiniStacker.Combat;
+using InfiniStacker.Feedback;
 using InfiniStacker.Player;
 using InfiniStacker.World;
 using UnityEngine;
@@ -89,8 +90,10 @@ namespace InfiniStacker.Enemy
             {
                 _killsTowardReinforcement = 0;
                 _playerSquad?.AddSoldiers(1);
+                FeedbackServices.Haptics?.LightImpact();
             }
 
+            FeedbackServices.ScreenShake?.Shake(0.06f, 0.07f);
             Recycle(enemy);
         }
 
@@ -103,6 +106,8 @@ namespace InfiniStacker.Enemy
 
             _playerSquad?.RemoveSoldiers(breachSquadLoss);
             _baseHealth?.ApplyDamage(breachBaseDamage);
+            FeedbackServices.ScreenShake?.Shake(0.12f, 0.1f);
+            FeedbackServices.Haptics?.MediumImpact();
             Recycle(enemy);
         }
 

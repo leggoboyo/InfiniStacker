@@ -25,9 +25,5 @@ namespace InfiniStacker.Gates
             };
         }
 
-        public bool IsPositive()
-        {
-            return Type != GateOperationType.Subtract;
-        }
     }
 }

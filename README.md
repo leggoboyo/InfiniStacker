@@ -18,16 +18,16 @@ Offline, original hyper-casual lane survival shooter prototype in Unity (URP tar
 If Unity CLI is unavailable, this repo still works through Unity Hub + Editor.
 
 ## How To Test (Current Milestone)
-### M3
+### M4
 1. Open `Assets/Scenes/Game.unity` and press Play.
 2. Press `Start` in the start panel.
 3. Drag finger (device) or mouse (editor) left/right and confirm player movement is clamped to bridge bounds.
 4. Confirm continuous forward auto-fire and enemy waves spawning from ahead.
-5. Confirm left/right gate pairs spawn periodically and scroll toward the player.
-6. Move to the left lane and confirm the left gate operation applies exactly once when the pair crosses the player line.
-7. Move to the right lane and confirm the right gate operation applies exactly once.
-8. Confirm gate colors and labels are clear (`+N`/`xN` positive, `-N` negative).
-9. Confirm soldier formation and bullet volume update immediately after each gate operation.
+5. Confirm left/right gate pairs spawn periodically and apply arithmetic once per pair.
+6. Confirm ice obstacles spawn ahead, can be shot to break, and remove squad soldiers if not cleared before contact.
+7. Confirm soldier formation and bullet volume update immediately after gate/obstacle/combat squad changes.
+8. Confirm Victory at 60 seconds and defeat when squad or base HP reaches 0.
+9. In Editor quick-test mode, press `1` add +10 squad, `2` spawn enemy wave, `3` spawn gate pair, `4` damage base, `5` spawn obstacle.
 10. Run EditMode tests and confirm all tests pass (`GateMathTests`, `SquadFormationTests`).
 11. Confirm Play Mode has no console errors.
 
@@ -36,3 +36,4 @@ If Unity CLI is unavailable, this repo still works through Unity Hub + Editor.
 - M1: Runtime bootstrap scene, bridge environment, drag movement, pooled bullets/VFX, enemy waves, base HP + timer, and start/victory/game-over UI.
 - M2: Player power now maps to soldier count with live formation updates and scalable firepower; enemy kills provide reinforcements while breaches remove soldiers.
 - M3: Arithmetic lane gates added (`+`, `-`, `x`) with deterministic application, clear color/text signage, and EditMode coverage for gate math and formation sizing.
+- M4: Destructible ice obstacles, screen-shake/haptics service hooks, editor debug hotkeys, and iOS build notes in `docs/IOS_BUILD.md`.
