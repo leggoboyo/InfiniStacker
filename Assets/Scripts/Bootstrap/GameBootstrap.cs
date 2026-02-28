@@ -1,6 +1,7 @@
 using InfiniStacker.Combat;
 using InfiniStacker.Core;
 using InfiniStacker.Enemy;
+using InfiniStacker.Gates;
 using InfiniStacker.Player;
 using InfiniStacker.UI;
 using InfiniStacker.World;
@@ -77,12 +78,17 @@ namespace InfiniStacker.Bootstrap
             enemySpawner.Initialize(enemyManager);
             enemySpawner.SetRunning(false);
 
+            var gateSpawnerGo = new GameObject("GateSpawner");
+            var gateSpawner = gateSpawnerGo.AddComponent<GateSpawner>();
+            gateSpawner.Initialize(playerSquad);
+            gateSpawner.SetRunning(false);
+
             var uiGo = new GameObject("GameUI");
             var uiController = uiGo.AddComponent<GameUIController>();
 
             var gameStateGo = new GameObject("GameStateController");
             var gameStateController = gameStateGo.AddComponent<GameStateController>();
-            gameStateController.Initialize(playerSquad, baseHealth, enemySpawner, enemyManager, autoFire, playerDragMover);
+            gameStateController.Initialize(playerSquad, baseHealth, enemySpawner, gateSpawner, enemyManager, autoFire, playerDragMover);
 
             uiController.Initialize(gameStateController);
         }

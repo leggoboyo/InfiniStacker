@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using InfiniStacker.Core;
+using InfiniStacker.Gates;
 using TMPro;
 using UnityEngine;
 
@@ -64,6 +65,11 @@ namespace InfiniStacker.Player
             }
 
             SetCount(Count - amount);
+        }
+
+        public void ApplyGateOperation(GateOperation operation)
+        {
+            SetCount(GateMath.Apply(Count, operation));
         }
 
         private void Awake()

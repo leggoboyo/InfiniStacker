@@ -1,5 +1,6 @@
 using InfiniStacker.Combat;
 using InfiniStacker.Enemy;
+using InfiniStacker.Gates;
 using InfiniStacker.Player;
 using InfiniStacker.World;
 using UnityEngine;
@@ -16,6 +17,7 @@ namespace InfiniStacker.Core
         private PlayerSquad _playerSquad;
         private BaseHealth _baseHealth;
         private EnemySpawner _enemySpawner;
+        private GateSpawner _gateSpawner;
         private EnemyManager _enemyManager;
         private AutoFireController _autoFireController;
         private PlayerDragMover _playerDragMover;
@@ -26,6 +28,7 @@ namespace InfiniStacker.Core
             PlayerSquad playerSquad,
             BaseHealth baseHealth,
             EnemySpawner enemySpawner,
+            GateSpawner gateSpawner,
             EnemyManager enemyManager,
             AutoFireController autoFireController,
             PlayerDragMover playerDragMover)
@@ -33,6 +36,7 @@ namespace InfiniStacker.Core
             _playerSquad = playerSquad;
             _baseHealth = baseHealth;
             _enemySpawner = enemySpawner;
+            _gateSpawner = gateSpawner;
             _enemyManager = enemyManager;
             _autoFireController = autoFireController;
             _playerDragMover = playerDragMover;
@@ -71,7 +75,7 @@ namespace InfiniStacker.Core
 
         public void StartGame()
         {
-            if (_playerSquad == null || _baseHealth == null || _enemySpawner == null || _enemyManager == null || _autoFireController == null)
+            if (_playerSquad == null || _baseHealth == null || _enemySpawner == null || _gateSpawner == null || _enemyManager == null || _autoFireController == null)
             {
                 Debug.LogError("GameStateController dependencies were not initialized.");
                 return;
@@ -83,6 +87,8 @@ namespace InfiniStacker.Core
             _enemyManager.SetRunning(true);
             _enemySpawner.ResetSpawner();
             _enemySpawner.SetRunning(true);
+            _gateSpawner.ResetSpawner();
+            _gateSpawner.SetRunning(true);
             _autoFireController.SetEnabled(true);
             _playerDragMover.SetEnabled(true);
 
@@ -102,6 +108,7 @@ namespace InfiniStacker.Core
             CurrentState = GameState.Start;
             _timer.Stop();
             _enemySpawner?.SetRunning(false);
+            _gateSpawner?.SetRunning(false);
             _enemyManager?.SetRunning(false);
             _autoFireController?.SetEnabled(false);
             _playerDragMover?.SetEnabled(false);
@@ -124,6 +131,7 @@ namespace InfiniStacker.Core
         {
             _timer.Stop();
             _enemySpawner?.SetRunning(false);
+            _gateSpawner?.SetRunning(false);
             _enemyManager?.SetRunning(false);
             _autoFireController?.SetEnabled(false);
             _playerDragMover?.SetEnabled(false);
