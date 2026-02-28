@@ -1,9 +1,9 @@
-# iOS Build Notes (Unity 2022.3 LTS)
+# iOS Build Notes (Unity Project Version)
 
 This project is offline-only and ships without ads/analytics/IAP/network dependencies.
 
 ## 1) Unity Player Settings
-1. Open project in Unity `2022.3 LTS`.
+1. Open project in Unity version from `InfiniStacker/ProjectSettings/ProjectVersion.txt`.
 2. Open `File > Build Settings...` and switch platform to `iOS`.
 3. In `Player Settings` configure:
    - `Company Name` / `Product Name`.

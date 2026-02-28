@@ -4,16 +4,17 @@ Offline, original hyper-casual lane survival shooter prototype in Unity (URP tar
 
 ## Constraints
 - Offline-only runtime (no ads, analytics, telemetry, remote config, IAP).
-- Unity 2022.3 LTS baseline.
+- Unity baseline from project version file (`InfiniStacker/ProjectSettings/ProjectVersion.txt`).
 - Input System for touch + mouse drag.
 - TextMeshPro for counters/labels.
 - No Asset Store or external dependencies.
 
 ## Open And Run
-1. Open this folder in Unity Hub using Unity `2022.3 LTS`.
-2. Let the editor finish script import (it auto-generates `Assets/Scenes/Game.unity` if missing).
-3. Open scene `Assets/Scenes/Game.unity`.
-4. Press Play.
+1. In Unity Hub, open project folder: `InfiniStacker/`.
+2. Use the Unity version recorded in `InfiniStacker/ProjectSettings/ProjectVersion.txt` (currently `6000.3.9f1` on this machine).
+3. Let script import finish (the bootstrap script auto-creates `Assets/Scenes/Game.unity` if missing).
+4. Open scene `Assets/Scenes/Game.unity` inside the `InfiniStacker` project.
+5. Press Play.
 
 If Unity CLI is unavailable, this repo still works through Unity Hub + Editor.
 
