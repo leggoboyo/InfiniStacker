@@ -2,9 +2,7 @@
   "name": "InfiniStacker.EditModeTests",
   "rootNamespace": "InfiniStacker.Tests",
   "references": [
-    "InfiniStacker.Runtime",
-    "UnityEngine.TestRunner",
-    "UnityEditor.TestRunner"
+    "InfiniStacker.Runtime"
   ],
   "includePlatforms": [
     "Editor"
