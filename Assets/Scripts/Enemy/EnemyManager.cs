@@ -12,6 +12,7 @@ namespace InfiniStacker.Enemy
         [SerializeField] private float breachZ = -1.8f;
         [SerializeField] private int breachBaseDamage = 10;
         [SerializeField] private int breachSquadLoss = 1;
+        [SerializeField] private int killsPerReinforcement = 5;
 
         private readonly List<EnemyAgent> _activeEnemies = new();
         private readonly Queue<EnemyAgent> _enemyPool = new();
@@ -20,6 +21,7 @@ namespace InfiniStacker.Enemy
         private PlayerSquad _playerSquad;
         private HitVfxPool _hitVfxPool;
         private bool _isRunning;
+        private int _killsTowardReinforcement;
 
         public int ActiveEnemyCount => _activeEnemies.Count;
 
@@ -37,6 +39,7 @@ namespace InfiniStacker.Enemy
 
         public void ResetAll()
         {
+            _killsTowardReinforcement = 0;
             for (var i = _activeEnemies.Count - 1; i >= 0; i--)
             {
                 Recycle(_activeEnemies[i]);
@@ -81,6 +84,13 @@ namespace InfiniStacker.Enemy
             }
 
             _hitVfxPool?.Spawn(enemy.transform.position);
+            _killsTowardReinforcement++;
+            if (_killsTowardReinforcement >= Mathf.Max(1, killsPerReinforcement))
+            {
+                _killsTowardReinforcement = 0;
+                _playerSquad?.AddSoldiers(1);
+            }
+
             Recycle(enemy);
         }
 

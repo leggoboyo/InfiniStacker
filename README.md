@@ -18,16 +18,19 @@ Offline, original hyper-casual lane survival shooter prototype in Unity (URP tar
 If Unity CLI is unavailable, this repo still works through Unity Hub + Editor.
 
 ## How To Test (Current Milestone)
-### M1
+### M2
 1. Open `Assets/Scenes/Game.unity` and press Play.
 2. Press `Start` in the start panel.
 3. Drag finger (device) or mouse (editor) left/right and confirm player movement is clamped to bridge bounds.
 4. Confirm continuous forward auto-fire and enemy waves spawning from ahead.
 5. Confirm enemies die on bullet hits with simple hit VFX.
-6. Confirm breaching enemies reduce squad and base HP.
-7. Confirm defeat triggers on squad/base depletion, or Victory triggers at 60 seconds.
-8. Confirm Play Mode has no console errors.
+6. Confirm squad count near player updates dynamically (breaches reduce squad; every 5 enemy kills grants +1 reinforcement soldier).
+7. Confirm soldier formation expands/contracts immediately as squad power changes.
+8. Confirm firepower scales with squad size (more visible bullet streams with larger squad).
+9. Confirm defeat triggers on squad/base depletion, or Victory triggers at 60 seconds.
+10. Confirm Play Mode has no console errors.
 
 ## Milestone Notes
 - M0: Repository scaffolding, agent guidance, backlog, changelog, and automation docs/skills.
 - M1: Runtime bootstrap scene, bridge environment, drag movement, pooled bullets/VFX, enemy waves, base HP + timer, and start/victory/game-over UI.
+- M2: Player power now maps to soldier count with live formation updates and scalable firepower; enemy kills provide reinforcements while breaches remove soldiers.

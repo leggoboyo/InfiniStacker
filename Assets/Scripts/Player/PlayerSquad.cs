@@ -18,6 +18,7 @@ namespace InfiniStacker.Player
         private TMP_Text _worldCountLabel;
 
         public int Count { get; private set; }
+        public int Power => Count;
         public IReadOnlyList<Transform> ActiveMuzzles => _activeMuzzles;
 
         public void SetWorldCountLabel(TMP_Text worldCountLabel)
@@ -28,7 +29,7 @@ namespace InfiniStacker.Player
 
         public void ResetSquad()
         {
-            SetCount(startCount);
+            ForceCount(startCount);
         }
 
         public void SetCount(int value)
@@ -67,7 +68,15 @@ namespace InfiniStacker.Player
 
         private void Awake()
         {
-            SetCount(startCount);
+            ForceCount(startCount);
+        }
+
+        private void ForceCount(int value)
+        {
+            Count = Mathf.Clamp(value, 0, maxCount);
+            RefreshVisuals();
+            UpdateWorldLabel();
+            GameEvents.RaiseSquadChanged(Count);
         }
 
         private void RefreshVisuals()
