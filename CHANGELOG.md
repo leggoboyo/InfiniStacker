@@ -6,3 +6,4 @@
 - Added M2 squad power progression: dynamic formation scaling, firepower scaling per soldier, and kill-based reinforcement growth.
 - Added M3 arithmetic gates with lane choice, deterministic gate math, and EditMode tests for gate operations + squad formation.
 - Added M4 destructible ice obstacles, debug quick-test keybinds, feedback hooks (screen shake + haptics stubs), and iOS build notes.
+- Added a visual fidelity pass in the nested Unity project (`InfiniStacker/`) with improved lighting, materials, environment detail, HUD safe-area layout, and upgraded unit/gate/obstacle visuals.

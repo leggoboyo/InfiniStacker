@@ -52,7 +52,13 @@ namespace InfiniStacker.Combat
                     continue;
                 }
 
-                if (collider.TryGetComponent<IBulletHittable>(out var hittable) && hittable.OnBulletHit(_damage, nextPosition))
+                var hittable = collider.GetComponent<IBulletHittable>();
+                if (hittable == null)
+                {
+                    hittable = collider.GetComponentInParent<IBulletHittable>();
+                }
+
+                if (hittable != null && hittable.OnBulletHit(_damage, nextPosition))
                 {
                     _hitVfxPool?.Spawn(nextPosition);
                     Despawn();

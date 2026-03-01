@@ -1,7 +1,14 @@
 {
   "name": "InfiniStacker.Runtime",
   "rootNamespace": "InfiniStacker",
-  "references": [],
+  "references": [
+    "Unity.InputSystem",
+    "Unity.InputSystem.ForUI",
+    "Unity.RenderPipelines.Core.Runtime",
+    "Unity.RenderPipelines.Universal.Runtime",
+    "Unity.TextMeshPro",
+    "UnityEngine.UI"
+  ],
   "includePlatforms": [],
   "excludePlatforms": [],
   "allowUnsafeCode": false,

@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using InfiniStacker.Combat;
 using InfiniStacker.Feedback;
 using InfiniStacker.Player;
+using InfiniStacker.Visual;
 using InfiniStacker.World;
 using UnityEngine;
 
@@ -58,6 +59,7 @@ namespace InfiniStacker.Enemy
 
             var enemy = _enemyPool.Count > 0 ? _enemyPool.Dequeue() : CreateEnemy();
             enemy.transform.position = worldPosition;
+            enemy.transform.localScale = Vector3.one * Random.Range(0.9f, 1.08f);
             enemy.Initialize(this, hp, speed);
             enemy.gameObject.SetActive(true);
             _activeEnemies.Add(enemy);
@@ -133,37 +135,205 @@ namespace InfiniStacker.Enemy
 
         private EnemyAgent CreateEnemy()
         {
-            var body = GameObject.CreatePrimitive(PrimitiveType.Capsule);
-            body.name = "Enemy";
-            body.transform.SetParent(transform, false);
-            body.transform.localScale = new Vector3(0.72f, 0.95f, 0.72f);
+            var enemyRoot = new GameObject("Enemy");
+            enemyRoot.transform.SetParent(transform, false);
 
-            var renderer = body.GetComponent<Renderer>();
+            var hitBody = CreatePart(
+                PrimitiveType.Capsule,
+                "HitBody",
+                enemyRoot.transform,
+                new Vector3(0f, 0.58f, 0f),
+                new Vector3(0.42f, 0.72f, 0.42f),
+                VisualTheme.ZombieCloth,
+                false);
+            var hitBodyRenderer = hitBody.GetComponent<Renderer>();
+            if (hitBodyRenderer != null)
+            {
+                hitBodyRenderer.enabled = false;
+            }
+
+            _ = CreatePart(
+                PrimitiveType.Cube,
+                "Chest",
+                enemyRoot.transform,
+                new Vector3(0f, 0.67f, 0.02f),
+                new Vector3(0.45f, 0.44f, 0.28f),
+                VisualTheme.ZombieCloth,
+                true);
+
+            _ = CreatePart(
+                PrimitiveType.Cube,
+                "Belly",
+                enemyRoot.transform,
+                new Vector3(0f, 0.46f, 0.03f),
+                new Vector3(0.38f, 0.26f, 0.24f),
+                VisualTheme.ZombieBody,
+                true);
+
+            _ = CreatePart(
+                PrimitiveType.Cube,
+                "Pelvis",
+                enemyRoot.transform,
+                new Vector3(0f, 0.3f, 0f),
+                new Vector3(0.32f, 0.19f, 0.24f),
+                VisualTheme.ZombiePants,
+                true);
+
+            _ = CreatePart(
+                PrimitiveType.Capsule,
+                "LeftLeg",
+                enemyRoot.transform,
+                new Vector3(-0.12f, 0.19f, 0f),
+                new Vector3(0.14f, 0.3f, 0.14f),
+                VisualTheme.ZombiePants,
+                true);
+
+            _ = CreatePart(
+                PrimitiveType.Capsule,
+                "RightLeg",
+                enemyRoot.transform,
+                new Vector3(0.12f, 0.19f, 0f),
+                new Vector3(0.14f, 0.3f, 0.14f),
+                VisualTheme.ZombiePants,
+                true);
+
+            _ = CreatePart(
+                PrimitiveType.Cube,
+                "LeftShoe",
+                enemyRoot.transform,
+                new Vector3(-0.12f, 0.02f, 0.06f),
+                new Vector3(0.16f, 0.08f, 0.24f),
+                VisualTheme.ZombieShoes,
+                true);
+
+            _ = CreatePart(
+                PrimitiveType.Cube,
+                "RightShoe",
+                enemyRoot.transform,
+                new Vector3(0.12f, 0.02f, 0.06f),
+                new Vector3(0.16f, 0.08f, 0.24f),
+                VisualTheme.ZombieShoes,
+                true);
+
+            _ = CreatePart(
+                PrimitiveType.Capsule,
+                "LeftArm",
+                enemyRoot.transform,
+                new Vector3(-0.31f, 0.66f, 0.08f),
+                new Vector3(0.1f, 0.3f, 0.1f),
+                VisualTheme.ZombieBody,
+                true).transform.localRotation = Quaternion.Euler(8f, 0f, 28f);
+
+            _ = CreatePart(
+                PrimitiveType.Capsule,
+                "RightArm",
+                enemyRoot.transform,
+                new Vector3(0.31f, 0.66f, 0.08f),
+                new Vector3(0.1f, 0.3f, 0.1f),
+                VisualTheme.ZombieBody,
+                true).transform.localRotation = Quaternion.Euler(8f, 0f, -28f);
+
+            _ = CreatePart(
+                PrimitiveType.Sphere,
+                "LeftHand",
+                enemyRoot.transform,
+                new Vector3(-0.37f, 0.46f, 0.14f),
+                new Vector3(0.09f, 0.09f, 0.09f),
+                VisualTheme.ZombieHead,
+                true);
+
+            _ = CreatePart(
+                PrimitiveType.Sphere,
+                "RightHand",
+                enemyRoot.transform,
+                new Vector3(0.37f, 0.46f, 0.14f),
+                new Vector3(0.09f, 0.09f, 0.09f),
+                VisualTheme.ZombieHead,
+                true);
+
+            var head = CreatePart(
+                PrimitiveType.Sphere,
+                "Head",
+                enemyRoot.transform,
+                new Vector3(0f, 1.03f, 0.01f),
+                new Vector3(0.31f, 0.31f, 0.31f),
+                VisualTheme.ZombieHead,
+                true);
+            head.transform.localRotation = Quaternion.Euler(12f, 0f, 0f);
+
+            _ = CreatePart(
+                PrimitiveType.Cube,
+                "Jaw",
+                enemyRoot.transform,
+                new Vector3(0f, 0.88f, 0.15f),
+                new Vector3(0.18f, 0.09f, 0.11f),
+                VisualTheme.ZombieMouth,
+                true);
+
+            _ = CreatePart(
+                PrimitiveType.Cube,
+                "Hair",
+                enemyRoot.transform,
+                new Vector3(0f, 1.17f, 0f),
+                new Vector3(0.25f, 0.08f, 0.2f),
+                VisualTheme.ZombieHair,
+                true);
+
+            _ = CreatePart(
+                PrimitiveType.Sphere,
+                "EyeLeft",
+                enemyRoot.transform,
+                new Vector3(-0.08f, 1.04f, 0.22f),
+                new Vector3(0.05f, 0.05f, 0.05f),
+                VisualTheme.ZombieEye,
+                true);
+
+            _ = CreatePart(
+                PrimitiveType.Sphere,
+                "EyeRight",
+                enemyRoot.transform,
+                new Vector3(0.08f, 1.04f, 0.22f),
+                new Vector3(0.05f, 0.05f, 0.05f),
+                VisualTheme.ZombieEye,
+                true);
+
+            var agent = enemyRoot.AddComponent<EnemyAgent>();
+            enemyRoot.transform.localRotation = Quaternion.Euler(0f, Random.Range(-7f, 7f), 0f);
+            enemyRoot.SetActive(false);
+            return agent;
+        }
+
+        private static GameObject CreatePart(
+            PrimitiveType primitiveType,
+            string name,
+            Transform parent,
+            Vector3 localPosition,
+            Vector3 localScale,
+            Material material,
+            bool removeCollider)
+        {
+            var part = GameObject.CreatePrimitive(primitiveType);
+            part.name = name;
+            part.transform.SetParent(parent, false);
+            part.transform.localPosition = localPosition;
+            part.transform.localScale = localScale;
+
+            var renderer = part.GetComponent<Renderer>();
             if (renderer != null)
             {
-                renderer.material.color = new Color(0.43f, 0.68f, 0.43f);
+                VisualTheme.ApplyMaterial(renderer, material);
             }
 
-            var head = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-            head.name = "Head";
-            head.transform.SetParent(body.transform, false);
-            head.transform.localPosition = new Vector3(0f, 0.62f, 0f);
-            head.transform.localScale = new Vector3(0.42f, 0.32f, 0.42f);
-            var headCollider = head.GetComponent<Collider>();
-            if (headCollider != null)
+            if (removeCollider)
             {
-                Destroy(headCollider);
+                var collider = part.GetComponent<Collider>();
+                if (collider != null)
+                {
+                    Object.Destroy(collider);
+                }
             }
 
-            var headRenderer = head.GetComponent<Renderer>();
-            if (headRenderer != null)
-            {
-                headRenderer.material.color = new Color(0.58f, 0.74f, 0.54f);
-            }
-
-            var agent = body.AddComponent<EnemyAgent>();
-            body.SetActive(false);
-            return agent;
+            return part;
         }
     }
 }

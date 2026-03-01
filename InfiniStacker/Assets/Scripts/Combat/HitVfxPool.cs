@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using InfiniStacker.Visual;
 using UnityEngine;
 
 namespace InfiniStacker.Combat
@@ -47,7 +48,7 @@ namespace InfiniStacker.Combat
             var go = GameObject.CreatePrimitive(PrimitiveType.Sphere);
             go.name = "HitVfx";
             go.transform.SetParent(transform, false);
-            go.transform.localScale = Vector3.one * 0.35f;
+            go.transform.localScale = Vector3.one * 0.42f;
 
             var collider = go.GetComponent<Collider>();
             if (collider != null)
@@ -58,7 +59,7 @@ namespace InfiniStacker.Combat
             var renderer = go.GetComponent<Renderer>();
             if (renderer != null)
             {
-                renderer.material.color = new Color(1f, 0.5f, 0.2f);
+                VisualTheme.ApplyMaterial(renderer, VisualTheme.Hit);
             }
 
             return go.AddComponent<HitVfx>();

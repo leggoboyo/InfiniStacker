@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using InfiniStacker.Combat;
 using InfiniStacker.Feedback;
 using InfiniStacker.Player;
+using InfiniStacker.Visual;
 using TMPro;
 using UnityEngine;
 
@@ -15,8 +16,9 @@ namespace InfiniStacker.Obstacles
         [SerializeField] private float despawnZ = -6f;
         [SerializeField] private int obstacleHp = 14;
         [SerializeField] private int collisionSquadLoss = 3;
+        [SerializeField] private float laneCenterX = 2.2f;
 
-        private static readonly float[] LanePositions = { -2.4f, 0f, 2.4f };
+        private static readonly float[] LaneOffsets = { -0.82f, 0f, 0.82f };
 
         private readonly List<IceObstacle> _activeObstacles = new();
         private readonly Queue<IceObstacle> _obstaclePool = new();
@@ -30,6 +32,11 @@ namespace InfiniStacker.Obstacles
         {
             _playerSquad = playerSquad;
             _hitVfxPool = hitVfxPool;
+        }
+
+        public void ConfigureLane(float centerX)
+        {
+            laneCenterX = centerX;
         }
 
         public void SetRunning(bool isRunning)
@@ -88,7 +95,7 @@ namespace InfiniStacker.Obstacles
                 var worldPos = obstacle.transform.position;
                 if (worldPos.z <= _playerSquad.transform.position.z + 0.1f)
                 {
-                    if (Mathf.Abs(worldPos.x - _playerSquad.transform.position.x) <= 1.3f)
+                    if (Mathf.Abs(worldPos.x - _playerSquad.transform.position.x) <= 1.05f)
                     {
                         _playerSquad.RemoveSoldiers(collisionSquadLoss);
                         FeedbackServices.ScreenShake?.Shake(0.18f, 0.12f);
@@ -109,8 +116,8 @@ namespace InfiniStacker.Obstacles
         private void SpawnObstacle()
         {
             var obstacle = _obstaclePool.Count > 0 ? _obstaclePool.Dequeue() : CreateObstacle();
-            var laneIndex = Random.Range(0, LanePositions.Length);
-            var x = LanePositions[laneIndex];
+            var laneIndex = Random.Range(0, LaneOffsets.Length);
+            var x = laneCenterX + LaneOffsets[laneIndex];
 
             obstacle.transform.position = new Vector3(x, 0.95f, spawnZ);
             var hpLabel = obstacle.GetComponentInChildren<TMP_Text>();
@@ -152,18 +159,60 @@ namespace InfiniStacker.Obstacles
             var block = GameObject.CreatePrimitive(PrimitiveType.Cube);
             block.name = "IceObstacle";
             block.transform.SetParent(transform, false);
-            block.transform.localScale = new Vector3(1.9f, 1.9f, 1.9f);
+            block.transform.localScale = new Vector3(1.7f, 1.7f, 1.7f);
 
             var renderer = block.GetComponent<Renderer>();
             if (renderer != null)
             {
-                renderer.material.color = new Color(0.74f, 0.94f, 1f, 0.8f);
+                VisualTheme.ApplyMaterial(renderer, VisualTheme.Ice);
+            }
+
+            for (var i = 0; i < 4; i++)
+            {
+                var shard = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                shard.name = $"Shard_{i}";
+                shard.transform.SetParent(block.transform, false);
+                shard.transform.localScale = new Vector3(0.54f, 0.92f, 0.54f);
+                shard.transform.localPosition = new Vector3(
+                    (i - 1.5f) * 0.28f,
+                    0.25f + ((i % 2) * 0.18f),
+                    (i % 2 == 0 ? -0.2f : 0.2f));
+                shard.transform.localRotation = Quaternion.Euler(12f * i, 25f * i, 8f * i);
+
+                var shardRenderer = shard.GetComponent<Renderer>();
+                if (shardRenderer != null)
+                {
+                    VisualTheme.ApplyMaterial(shardRenderer, VisualTheme.Ice);
+                }
+
+                var shardCollider = shard.GetComponent<Collider>();
+                if (shardCollider != null)
+                {
+                    Destroy(shardCollider);
+                }
             }
 
             var hpLabelGo = new GameObject("HpLabel");
             hpLabelGo.transform.SetParent(block.transform, false);
-            hpLabelGo.transform.localPosition = new Vector3(0f, 0.72f, 0f);
-            hpLabelGo.transform.localScale = Vector3.one * 0.22f;
+            hpLabelGo.transform.localPosition = new Vector3(0f, 0.82f, 0f);
+            hpLabelGo.transform.localScale = Vector3.one * 0.2f;
+
+            var hpBackplate = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            hpBackplate.name = "LabelBackplate";
+            hpBackplate.transform.SetParent(hpLabelGo.transform, false);
+            hpBackplate.transform.localPosition = new Vector3(0f, 0f, 0.38f);
+            hpBackplate.transform.localScale = new Vector3(2.6f, 1.3f, 0.2f);
+            var hpBackplateRenderer = hpBackplate.GetComponent<Renderer>();
+            if (hpBackplateRenderer != null)
+            {
+                VisualTheme.ApplyMaterial(hpBackplateRenderer, VisualTheme.GateFrame);
+            }
+
+            var hpBackplateCollider = hpBackplate.GetComponent<Collider>();
+            if (hpBackplateCollider != null)
+            {
+                Destroy(hpBackplateCollider);
+            }
 
             var hpText = hpLabelGo.AddComponent<TextMeshPro>();
             hpText.fontSize = 10f;

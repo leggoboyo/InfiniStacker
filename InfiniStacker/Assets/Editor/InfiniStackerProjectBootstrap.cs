@@ -60,12 +60,13 @@ namespace InfiniStacker.Editor
 
             var serializedObject = new SerializedObject(settingsAssets[0]);
             var inputHandler = serializedObject.FindProperty("activeInputHandler");
-            if (inputHandler == null || inputHandler.intValue == 2)
+            if (inputHandler == null || inputHandler.intValue == 1)
             {
                 return;
             }
 
-            inputHandler.intValue = 2;
+            // 1 = Input System Package (New)
+            inputHandler.intValue = 1;
             serializedObject.ApplyModifiedPropertiesWithoutUndo();
             AssetDatabase.SaveAssets();
         }

@@ -4,6 +4,7 @@ using InfiniStacker.Feedback;
 using InfiniStacker.Gates;
 using InfiniStacker.Obstacles;
 using InfiniStacker.Player;
+using InfiniStacker.Upgrades;
 using InfiniStacker.World;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -24,6 +25,8 @@ namespace InfiniStacker.Core
         private EnemyManager _enemyManager;
         private AutoFireController _autoFireController;
         private PlayerDragMover _playerDragMover;
+        private UpgradeBlockSpawner _upgradeBlockSpawner;
+        private WeaponUpgradeSystem _weaponUpgradeSystem;
 
         public GameState CurrentState { get; private set; } = GameState.Start;
 
@@ -33,18 +36,22 @@ namespace InfiniStacker.Core
             EnemySpawner enemySpawner,
             GateSpawner gateSpawner,
             ObstacleSpawner obstacleSpawner,
+            UpgradeBlockSpawner upgradeBlockSpawner,
             EnemyManager enemyManager,
             AutoFireController autoFireController,
-            PlayerDragMover playerDragMover)
+            PlayerDragMover playerDragMover,
+            WeaponUpgradeSystem weaponUpgradeSystem = null)
         {
             _playerSquad = playerSquad;
             _baseHealth = baseHealth;
             _enemySpawner = enemySpawner;
             _gateSpawner = gateSpawner;
             _obstacleSpawner = obstacleSpawner;
+            _upgradeBlockSpawner = upgradeBlockSpawner;
             _enemyManager = enemyManager;
             _autoFireController = autoFireController;
             _playerDragMover = playerDragMover;
+            _weaponUpgradeSystem = weaponUpgradeSystem;
 
             _timer.Configure(survivalDurationSeconds);
             EnterStartState();
@@ -88,6 +95,7 @@ namespace InfiniStacker.Core
 
             _playerSquad.ResetSquad();
             _baseHealth.ResetHealth();
+            _weaponUpgradeSystem?.ResetProgression();
             _enemyManager.ResetAll();
             _enemyManager.SetRunning(true);
             _enemySpawner.ResetSpawner();
@@ -96,6 +104,8 @@ namespace InfiniStacker.Core
             _gateSpawner.SetRunning(true);
             _obstacleSpawner.ResetSpawner();
             _obstacleSpawner.SetRunning(true);
+            _upgradeBlockSpawner?.ResetSpawner();
+            _upgradeBlockSpawner?.SetRunning(true);
             _autoFireController.SetEnabled(true);
             _playerDragMover.SetEnabled(true);
 
@@ -117,6 +127,7 @@ namespace InfiniStacker.Core
             _enemySpawner?.SetRunning(false);
             _gateSpawner?.SetRunning(false);
             _obstacleSpawner?.SetRunning(false);
+            _upgradeBlockSpawner?.SetRunning(false);
             _enemyManager?.SetRunning(false);
             _autoFireController?.SetEnabled(false);
             _playerDragMover?.SetEnabled(false);
@@ -131,6 +142,8 @@ namespace InfiniStacker.Core
                 _playerSquad.ResetSquad();
             }
 
+            _weaponUpgradeSystem?.ResetProgression();
+
             GameEvents.RaiseTimerChanged(survivalDurationSeconds);
             GameEvents.RaiseGameStateChanged(CurrentState, null);
         }
@@ -141,6 +154,7 @@ namespace InfiniStacker.Core
             _enemySpawner?.SetRunning(false);
             _gateSpawner?.SetRunning(false);
             _obstacleSpawner?.SetRunning(false);
+            _upgradeBlockSpawner?.SetRunning(false);
             _enemyManager?.SetRunning(false);
             _autoFireController?.SetEnabled(false);
             _playerDragMover?.SetEnabled(false);

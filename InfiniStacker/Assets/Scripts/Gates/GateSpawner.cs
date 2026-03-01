@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using InfiniStacker.Feedback;
 using InfiniStacker.Player;
+using InfiniStacker.Visual;
 using TMPro;
 using UnityEngine;
 
@@ -12,7 +13,9 @@ namespace InfiniStacker.Gates
         [SerializeField] private float gateSpeed = 4.3f;
         [SerializeField] private float spawnZ = 27f;
         [SerializeField] private float despawnZ = -5.5f;
-        [SerializeField] private float laneOffsetX = 2.2f;
+        [SerializeField] private float laneCenterX = 2.2f;
+        [SerializeField] private float laneChoiceOffsetX = 0.82f;
+        [SerializeField] private float activationHalfWidth = 1.65f;
         [SerializeField] private float gateY = 1.05f;
 
         private readonly List<GatePairRuntime> _activePairs = new();
@@ -24,6 +27,12 @@ namespace InfiniStacker.Gates
         public void Initialize(PlayerSquad playerSquad)
         {
             _playerSquad = playerSquad;
+        }
+
+        public void ConfigureLane(float centerX, float choiceOffsetX)
+        {
+            laneCenterX = centerX;
+            laneChoiceOffsetX = Mathf.Clamp(choiceOffsetX, 0.35f, 1.6f);
         }
 
         public void SetRunning(bool isRunning)
@@ -65,20 +74,31 @@ namespace InfiniStacker.Gates
             {
                 var pair = _activePairs[i];
                 pair.Z -= gateSpeed * Time.deltaTime;
-                pair.LeftObject.transform.position = new Vector3(-laneOffsetX, gateY, pair.Z);
-                pair.RightObject.transform.position = new Vector3(laneOffsetX, gateY, pair.Z);
+                pair.LeftObject.transform.position = new Vector3(laneCenterX - laneChoiceOffsetX, gateY, pair.Z);
+                pair.RightObject.transform.position = new Vector3(laneCenterX + laneChoiceOffsetX, gateY, pair.Z);
 
                 if (!pair.Applied && pair.Z <= _playerSquad.transform.position.z + 0.1f)
                 {
-                    var chooseLeft = _playerSquad.transform.position.x < 0f;
-                    var selectedOperation = chooseLeft ? pair.LeftOperation : pair.RightOperation;
-                    _playerSquad.ApplyGateOperation(selectedOperation);
-                    pair.Applied = true;
-                    FeedbackServices.ScreenShake?.Shake(0.07f, 0.07f);
-                    FeedbackServices.Haptics?.LightImpact();
+                    if (Mathf.Abs(_playerSquad.transform.position.x - laneCenterX) <= activationHalfWidth)
+                    {
+                        var chooseLeft = _playerSquad.transform.position.x < laneCenterX;
+                        var selectedOperation = chooseLeft ? pair.LeftOperation : pair.RightOperation;
+                        _playerSquad.ApplyGateOperation(selectedOperation);
+                        FeedbackServices.ScreenShake?.Shake(0.07f, 0.07f);
+                        FeedbackServices.Haptics?.LightImpact();
+                    }
 
-                    pair.LeftRenderer.material.color = new Color(0.35f, 0.35f, 0.35f);
-                    pair.RightRenderer.material.color = new Color(0.35f, 0.35f, 0.35f);
+                    pair.Applied = true;
+
+                    if (pair.LeftSignRenderer != null)
+                    {
+                        VisualTheme.ApplyMaterial(pair.LeftSignRenderer, VisualTheme.GateUsed);
+                    }
+
+                    if (pair.RightSignRenderer != null)
+                    {
+                        VisualTheme.ApplyMaterial(pair.RightSignRenderer, VisualTheme.GateUsed);
+                    }
                 }
 
                 if (pair.Z <= despawnZ)
@@ -97,8 +117,16 @@ namespace InfiniStacker.Gates
             var (left, right) = CreateOperationPair();
             var z = spawnZ;
             var pairId = ++_nextPairId;
-            var leftGate = CreateGateObject($"Gate_{pairId}_L", left, new Vector3(-laneOffsetX, gateY, z));
-            var rightGate = CreateGateObject($"Gate_{pairId}_R", right, new Vector3(laneOffsetX, gateY, z));
+            var leftGate = CreateGateObject(
+                $"Gate_{pairId}_L",
+                left,
+                new Vector3(laneCenterX - laneChoiceOffsetX, gateY, z),
+                out var leftSignRenderer);
+            var rightGate = CreateGateObject(
+                $"Gate_{pairId}_R",
+                right,
+                new Vector3(laneCenterX + laneChoiceOffsetX, gateY, z),
+                out var rightSignRenderer);
 
             var runtime = new GatePairRuntime
             {
@@ -107,8 +135,8 @@ namespace InfiniStacker.Gates
                 RightOperation = right,
                 LeftObject = leftGate,
                 RightObject = rightGate,
-                LeftRenderer = leftGate.GetComponent<Renderer>(),
-                RightRenderer = rightGate.GetComponent<Renderer>(),
+                LeftSignRenderer = leftSignRenderer,
+                RightSignRenderer = rightSignRenderer,
                 Applied = false
             };
 
@@ -139,44 +167,103 @@ namespace InfiniStacker.Gates
             return Random.value < 0.5f ? (positive, negative) : (negative, positive);
         }
 
-        private static GameObject CreateGateObject(string name, GateOperation operation, Vector3 position)
+        private static GameObject CreateGateObject(string name, GateOperation operation, Vector3 position, out Renderer signRenderer)
         {
-            var gate = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            gate.name = name;
-            gate.transform.position = position;
-            gate.transform.localScale = new Vector3(2.4f, 2f, 0.3f);
+            var root = new GameObject(name);
+            root.transform.position = position;
 
-            var collider = gate.GetComponent<Collider>();
-            if (collider != null)
-            {
-                Destroy(collider);
-            }
+            _ = CreatePart(
+                PrimitiveType.Cube,
+                "FrameLeft",
+                root.transform,
+                new Vector3(-0.72f, 0f, 0f),
+                new Vector3(0.13f, 2.2f, 0.25f),
+                VisualTheme.GateFrame,
+                true);
 
-            var renderer = gate.GetComponent<Renderer>();
-            if (renderer != null)
+            _ = CreatePart(
+                PrimitiveType.Cube,
+                "FrameRight",
+                root.transform,
+                new Vector3(0.72f, 0f, 0f),
+                new Vector3(0.13f, 2.2f, 0.25f),
+                VisualTheme.GateFrame,
+                true);
+
+            _ = CreatePart(
+                PrimitiveType.Cube,
+                "FrameTop",
+                root.transform,
+                new Vector3(0f, 1.06f, 0f),
+                new Vector3(1.62f, 0.15f, 0.25f),
+                VisualTheme.GateFrame,
+                true);
+
+            var gateMaterial = operation.Type switch
             {
-                renderer.material.color = operation.Type switch
-                {
-                    GateOperationType.Add => new Color(0.18f, 0.72f, 0.9f),
-                    GateOperationType.Multiply => new Color(0.24f, 0.74f, 0.38f),
-                    _ => new Color(0.92f, 0.33f, 0.25f)
-                };
-            }
+                GateOperationType.Add => VisualTheme.GateAdd,
+                GateOperationType.Multiply => VisualTheme.GateMultiply,
+                _ => VisualTheme.GateSubtract
+            };
+
+            var sign = CreatePart(
+                PrimitiveType.Cube,
+                "Sign",
+                root.transform,
+                new Vector3(0f, 0f, -0.02f),
+                new Vector3(1.36f, 1.76f, 0.22f),
+                gateMaterial,
+                true);
+
+            signRenderer = sign.GetComponent<Renderer>();
 
             var textGo = new GameObject("Label");
-            textGo.transform.SetParent(gate.transform, false);
+            textGo.transform.SetParent(root.transform, false);
             textGo.transform.localPosition = new Vector3(0f, 0f, -0.18f);
-            textGo.transform.localScale = Vector3.one * 0.34f;
+            textGo.transform.localScale = Vector3.one * 0.28f;
 
             var text = textGo.AddComponent<TextMeshPro>();
             text.text = operation.ToDisplayText();
             text.alignment = TextAlignmentOptions.Center;
-            text.fontSize = 9f;
+            text.fontSize = 11f;
             text.color = Color.white;
-            text.outlineColor = new Color(0f, 0f, 0f, 0.8f);
-            text.outlineWidth = 0.25f;
+            text.outlineColor = new Color(0f, 0f, 0f, 0.82f);
+            text.outlineWidth = 0.22f;
 
-            return gate;
+            return root;
+        }
+
+        private static GameObject CreatePart(
+            PrimitiveType primitiveType,
+            string name,
+            Transform parent,
+            Vector3 localPosition,
+            Vector3 localScale,
+            Material material,
+            bool removeCollider)
+        {
+            var part = GameObject.CreatePrimitive(primitiveType);
+            part.name = name;
+            part.transform.SetParent(parent, false);
+            part.transform.localPosition = localPosition;
+            part.transform.localScale = localScale;
+
+            var renderer = part.GetComponent<Renderer>();
+            if (renderer != null)
+            {
+                VisualTheme.ApplyMaterial(renderer, material);
+            }
+
+            if (removeCollider)
+            {
+                var collider = part.GetComponent<Collider>();
+                if (collider != null)
+                {
+                    Destroy(collider);
+                }
+            }
+
+            return part;
         }
 
         private struct GatePairRuntime
@@ -186,8 +273,8 @@ namespace InfiniStacker.Gates
             public GateOperation RightOperation;
             public GameObject LeftObject;
             public GameObject RightObject;
-            public Renderer LeftRenderer;
-            public Renderer RightRenderer;
+            public Renderer LeftSignRenderer;
+            public Renderer RightSignRenderer;
             public bool Applied;
         }
     }

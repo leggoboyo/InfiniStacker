@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using InfiniStacker.Visual;
 using UnityEngine;
 
 namespace InfiniStacker.Combat
@@ -51,10 +52,11 @@ namespace InfiniStacker.Combat
 
         private Bullet CreateBullet()
         {
-            var go = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            var go = GameObject.CreatePrimitive(PrimitiveType.Capsule);
             go.name = "Bullet";
             go.transform.SetParent(transform, false);
-            go.transform.localScale = new Vector3(0.1f, 0.1f, 0.2f);
+            go.transform.localScale = new Vector3(0.08f, 0.18f, 0.08f);
+            go.transform.localRotation = Quaternion.Euler(90f, 0f, 0f);
 
             var collider = go.GetComponent<Collider>();
             if (collider != null)
@@ -65,7 +67,7 @@ namespace InfiniStacker.Combat
             var renderer = go.GetComponent<Renderer>();
             if (renderer != null)
             {
-                renderer.material.color = new Color(1f, 0.84f, 0.35f);
+                VisualTheme.ApplyMaterial(renderer, VisualTheme.Bullet);
             }
 
             return go.AddComponent<Bullet>();

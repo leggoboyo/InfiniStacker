@@ -7,7 +7,8 @@ namespace InfiniStacker.Player
     {
         [SerializeField] private float moveSmoothing = 18f;
         [SerializeField] private float dragToWorldScale = 14f;
-        [SerializeField] private float maxAbsX = 3.6f;
+        [SerializeField] private float minX = -3.6f;
+        [SerializeField] private float maxX = 3.6f;
 
         private bool _isDragging;
         private Vector2 _lastPointerPosition;
@@ -22,8 +23,15 @@ namespace InfiniStacker.Player
 
         public void Configure(float horizontalBounds)
         {
-            maxAbsX = Mathf.Max(0.5f, horizontalBounds);
-            _targetX = Mathf.Clamp(transform.position.x, -maxAbsX, maxAbsX);
+            var clampedBounds = Mathf.Max(0.5f, horizontalBounds);
+            Configure(-clampedBounds, clampedBounds);
+        }
+
+        public void Configure(float newMinX, float newMaxX)
+        {
+            minX = Mathf.Min(newMinX, newMaxX);
+            maxX = Mathf.Max(newMinX, newMaxX);
+            _targetX = Mathf.Clamp(transform.position.x, minX, maxX);
         }
 
         public void SetEnabled(bool enabled)
@@ -73,7 +81,7 @@ namespace InfiniStacker.Player
                 _lastPointerPosition = pointerPosition;
 
                 var normalized = deltaX / Mathf.Max(1f, Screen.width);
-                _targetX = Mathf.Clamp(_targetX + (normalized * dragToWorldScale), -maxAbsX, maxAbsX);
+                _targetX = Mathf.Clamp(_targetX + (normalized * dragToWorldScale), minX, maxX);
             }
             else
             {

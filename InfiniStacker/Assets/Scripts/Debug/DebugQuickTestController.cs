@@ -2,6 +2,7 @@ using InfiniStacker.Enemy;
 using InfiniStacker.Gates;
 using InfiniStacker.Obstacles;
 using InfiniStacker.Player;
+using InfiniStacker.Upgrades;
 using InfiniStacker.World;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -14,6 +15,7 @@ namespace InfiniStacker.DebugTools
         private EnemySpawner _enemySpawner;
         private GateSpawner _gateSpawner;
         private ObstacleSpawner _obstacleSpawner;
+        private UpgradeBlockSpawner _upgradeBlockSpawner;
         private BaseHealth _baseHealth;
 
         public void Initialize(
@@ -21,12 +23,14 @@ namespace InfiniStacker.DebugTools
             EnemySpawner enemySpawner,
             GateSpawner gateSpawner,
             ObstacleSpawner obstacleSpawner,
+            UpgradeBlockSpawner upgradeBlockSpawner,
             BaseHealth baseHealth)
         {
             _playerSquad = playerSquad;
             _enemySpawner = enemySpawner;
             _gateSpawner = gateSpawner;
             _obstacleSpawner = obstacleSpawner;
+            _upgradeBlockSpawner = upgradeBlockSpawner;
             _baseHealth = baseHealth;
         }
 
@@ -62,6 +66,11 @@ namespace InfiniStacker.DebugTools
             if (keyboard.digit5Key.wasPressedThisFrame)
             {
                 _obstacleSpawner?.SpawnImmediateObstacle();
+            }
+
+            if (keyboard.digit6Key.wasPressedThisFrame)
+            {
+                _upgradeBlockSpawner?.SpawnImmediateBlock();
             }
 #endif
         }
